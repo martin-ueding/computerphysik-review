@@ -79,8 +79,8 @@ def get_name_and_week(path):
     >>> get_name_and_week('/home/mu/Dokumente/Tutorieren/Computerphysik/Abgaben/Ueding/01')
     ('Ueding', '01')
     '''
-    base, week = os.path.split(path)
-    ignored, name = os.path.split(base)
+    base, name = os.path.split(path)
+    ignored, week = os.path.split(base)
     nicename = name.replace('_', ' ').replace('-', ', ')
     return name, nicename, week
 
