@@ -119,8 +119,12 @@ def process_folder(folder, template):
 
         print(os.listdir(tempdir))
 
-        shutil.copy(os.path.join(tempdir, pdf_basename),
-                    os.path.join(os.path.dirname(abs_path), pdf_basename))
+        aux_pdf_files = filter(lambda x: x.lower().endswith('.pdf'), files)
+
+        command = ['pdfunite', os.path.join(tempdir, pdf_basename)] \
+                + [os.path.join(abs_path, aux) for aux in aux_pdf_files] \
+                + [os.path.join(os.path.dirname(abs_path), pdf_basename)]
+        subprocess.check_call(command)
 
 
 def main():
