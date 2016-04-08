@@ -5,7 +5,6 @@
 # Licensed under The MIT License
 
 import argparse
-import glob
 import os
 import shutil
 import subprocess
@@ -50,9 +49,29 @@ RAW_TEMPLATE = r'''
 \end{document}
 '''
 
+EXTENSIONS = ['.h', '.hpp', '.c', '.cpp']
+
+
 def order_files(files):
-    files.sort()
-    return files
+    roots = {}
+    for file_ in files:
+        root, ext = os.path.splitext(file_)
+        if ext not in EXTENSIONS:
+            continue
+
+        if root not in roots:
+            roots[root] = []
+
+        roots[root].append(ext)
+
+    result = []
+
+    for root, exts in sorted(roots.items()):
+        for ext in EXTENSIONS:
+            if ext in exts:
+                result.append(root + ext)
+
+    return result
 
 
 def get_name_and_week(path):
