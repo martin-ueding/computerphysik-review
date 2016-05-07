@@ -24,6 +24,7 @@ RAW_TEMPLATE = r'''
 \usepackage{beramono}
 \usepackage{minted}
 \usepackage{multicol}
+\usepackage{booktabs}
 
 \subject{Abgabe in Computerphysik (Sommersemester 2016)}
 \title{Woche << week >>}
@@ -39,11 +40,24 @@ RAW_TEMPLATE = r'''
 
 \maketitle
 
-\begin{multicols}{2}
-    Dies ist der Quelltext, den du abgegeben hast. Ich habe ihn mit meinem
-    Standard-Stil umformatiert, damit ich es bei der Korrektur etwas einfacher
-    habe. Der Inhalt vom Code hat sich aber nicht geändert.
-\end{multicols}
+\begin{center}
+    \begin{tabular}{lll}
+        \toprule
+        Teil & erreicht & möglich \\
+        \midrule
+        Aufgaben && \\
+        Stil && \\
+        \bottomrule
+    \end{tabular}
+
+    \vspace{2ex}
+
+    \begin{minipage}{.5\textwidth}
+        Dies ist der Quelltext, den du abgegeben hast. Ich habe ihn mit meinem
+        Standard-Stil umformatiert, damit ich es bei der Korrektur etwas einfacher
+        habe. Der Inhalt vom Code hat sich aber nicht geändert.
+    \end{minipage}
+\end{center}
 
 %< for basename, filename, language in files >%
 \section*{<< basename >>}
@@ -56,6 +70,8 @@ RAW_TEMPLATE = r'''
 ]{<< language >>}{<< filename >>}
 \clearpage
 %< endfor >%
+
+\section*{Zusätzliche Kommentare}
 
 \end{document}
 '''
@@ -131,8 +147,9 @@ def process_folder(folder, files, template):
 
     is_c = lambda x: os.path.splitext(x.lower())[1] in EXT_C
     is_txt = lambda x: os.path.splitext(x.lower())[1] in EXT_TXT
+    is_pdf = lambda x: os.path.splitext(x.lower())[1] == '.pdf'
 
-    pdf_files = list(filter(lambda x: os.path.splitext(x.lower()) in EXT_IMG, files))
+    pdf_files = list(filter(is_pdf, files))
 
     with tempfile.TemporaryDirectory() as tempdir:
         for_minted = []
@@ -176,6 +193,7 @@ def process_folder(folder, files, template):
         command = ['pdfunite', os.path.join(tempdir, pdf_basename)] \
                 + pdf_files \
                 + [pdf_basename]
+        print(command)
         subprocess.check_call(command)
 
 
