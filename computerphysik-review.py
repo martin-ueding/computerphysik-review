@@ -47,6 +47,8 @@ RAW_TEMPLATE = r'''
         \midrule
         Aufgaben && \\
         Stil && \\
+        \midrule
+        Summe && \\
         \bottomrule
     \end{tabular}
 
@@ -78,7 +80,7 @@ RAW_TEMPLATE = r'''
 
 EXT_C = ['.h', '.hpp', '.c', '.cpp']
 EXT_IMG = ['.pdf']
-EXT_TXT = ['.txt']
+EXT_TXT = ['.txt', '.dat']
 
 
 def decode(s, encodings=('utf8', 'latin1', 'ascii')):
@@ -148,22 +150,32 @@ def process_folder(folder, files, template):
     is_c = lambda x: os.path.splitext(x.lower())[1] in EXT_C
     is_txt = lambda x: os.path.splitext(x.lower())[1] in EXT_TXT
     is_pdf = lambda x: os.path.splitext(x.lower())[1] == '.pdf'
+    is_make = lambda x: x.lower() == 'makefile'
 
     pdf_files = list(filter(is_pdf, files))
 
     with tempfile.TemporaryDirectory() as tempdir:
         for_minted = []
         for file_ in files:
-            basename = os.path.basename(file_).replace('_', r'\_')
-            if is_c(file_):
+            basename = os.path.basename(file_)
+            tex_name = file_.replace('_', r'\_')
+            temp_dirname = os.path.join(tempdir, os.path.dirname(file_))
+            subprocess.call(['ls', '-la', tempdir])
+            subprocess.check_call(['mkdir', '-p', temp_dirname])
+            temp_path = os.path.join(tempdir, file_)
+            if is_c(basename):
                 formatted_path = os.path.join(tempdir, file_)
                 format_c_file(os.path.join(folder, file_), formatted_path)
-                for_minted.append((basename, formatted_path, 'c'))
-            elif is_txt(file_):
+                for_minted.append((tex_name, formatted_path, 'c'))
+            elif is_txt(basename):
                 #formatted_path = os.path.join(tempdir, file_)
                 #format_txt_file(os.path.join(folder, file_), formatted_path)
                 #for_minted.append((basename, formatted_path, 'text'))
-                for_minted.append((basename, os.path.join(abs_path, file_), 'text'))
+                shutil.copy(file_, temp_path)
+                for_minted.append((tex_name, temp_path, 'text'))
+            elif is_make(basename):
+                shutil.copy(file_, temp_path)
+                for_minted.append((tex_name, temp_path, 'make'))
 
         print(for_minted)
 
