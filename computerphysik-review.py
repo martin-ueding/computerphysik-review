@@ -41,14 +41,14 @@ RAW_TEMPLATE = r'''
 \maketitle
 
 \begin{center}
-    \begin{tabular}{lll}
+    \begin{tabular}{llr}
         \toprule
         Teil & erreicht & möglich \\
         \midrule
-        Aufgaben && \\
-        Stil && \\
+        Aufgaben && 18 \\
+        Stil && 2 \\
         \midrule
-        Summe && \\
+        Summe && 20 \\
         \bottomrule
     \end{tabular}
 
