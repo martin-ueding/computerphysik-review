@@ -81,6 +81,7 @@ RAW_TEMPLATE = r'''
 EXT_C = ['.h', '.hpp', '.c', '.cpp']
 EXT_IMG = ['.pdf']
 EXT_TXT = ['.txt', '.dat']
+EXT_DIFF = ['.diff', '.patch']
 
 
 def decode(s, encodings=('utf8', 'latin1', 'ascii')):
@@ -149,6 +150,7 @@ def process_folder(folder, files, template):
 
     is_c = lambda x: os.path.splitext(x.lower())[1] in EXT_C
     is_txt = lambda x: os.path.splitext(x.lower())[1] in EXT_TXT
+    is_diff = lambda x: os.path.splitext(x.lower())[1] in EXT_DIFF
     is_pdf = lambda x: os.path.splitext(x.lower())[1] == '.pdf'
     is_make = lambda x: x.lower() == 'makefile'
 
@@ -176,6 +178,9 @@ def process_folder(folder, files, template):
             elif is_make(basename):
                 shutil.copy(file_, temp_path)
                 for_minted.append((tex_name, temp_path, 'make'))
+            elif is_diff(basename):
+                shutil.copy(file_, temp_path)
+                for_minted.append((tex_name, temp_path, 'diff'))
 
         print(for_minted)
 
