@@ -190,7 +190,7 @@ def process_folder(folder, files, template):
             f.write(rendered)
 
         lualatex_command = ['lualatex', '--enable-write18', '--halt-on-error']
-        pdflatex_command = ['pdflatex', '-shell-escape', '-halt-on-error']
+        pdflatex_command = ['latexrun', '--latex-args', '-shell-escape -halt-on-error']
         command = pdflatex_command + [tex_basename]
         try:
             subprocess.check_call(command, cwd=tempdir)
