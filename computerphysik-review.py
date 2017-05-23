@@ -25,6 +25,7 @@ RAW_TEMPLATE = r'''
 \usepackage{minted}
 \usepackage{multicol}
 \usepackage{booktabs}
+\usepackage{graphicx}
 
 \subject{Abgabe in Computerphysik (Sommersemester 2016)}
 \title{Woche << week >>}
@@ -73,15 +74,24 @@ RAW_TEMPLATE = r'''
 \clearpage
 %< endfor >%
 
+%< for image in images >%
+\section*{<< basename >>}
+
+\includegraphics[width=\linewidth]{<< image >>}
+%< endfor >%
+
+\clearpage
 \section*{Zusätzliche Kommentare}
 
 \end{document}
 '''
 
 EXT_C = ['.h', '.hpp', '.c', '.cpp']
+EXT_PYTHON = ['.py']
 EXT_IMG = ['.pdf']
 EXT_TXT = ['.txt', '.dat']
 EXT_DIFF = ['.diff', '.patch']
+EXT_IMG = ['.jpg', '.png']
 
 
 def decode(s, encodings=('utf8', 'latin1', 'ascii')):
@@ -151,6 +161,8 @@ def process_folder(folder, files, template):
     is_c = lambda x: os.path.splitext(x.lower())[1] in EXT_C
     is_txt = lambda x: os.path.splitext(x.lower())[1] in EXT_TXT
     is_diff = lambda x: os.path.splitext(x.lower())[1] in EXT_DIFF
+    is_python = lambda x: os.path.splitext(x.lower())[1] in EXT_PYTHON
+    is_image = lambda x: os.path.splitext(x.lower())[1] in EXT_IMG
     is_pdf = lambda x: os.path.splitext(x.lower())[1] == '.pdf'
     is_make = lambda x: x.lower() == 'makefile'
 
@@ -158,6 +170,7 @@ def process_folder(folder, files, template):
 
     with tempfile.TemporaryDirectory() as tempdir:
         for_minted = []
+        images = []
         for file_ in files:
             basename = os.path.basename(file_)
             tex_name = file_.replace('_', r'\_')
@@ -178,15 +191,21 @@ def process_folder(folder, files, template):
             elif is_make(basename):
                 shutil.copy(file_, temp_path)
                 for_minted.append((tex_name, temp_path, 'make'))
+            elif is_python(basename):
+                shutil.copy(file_, temp_path)
+                for_minted.append((tex_name, temp_path, 'python'))
             elif is_diff(basename):
                 shutil.copy(file_, temp_path)
                 for_minted.append((tex_name, temp_path, 'diff'))
+            elif is_image(basename):
+                shutil.copy(file_, temp_path)
+                images.append(temp_path)
 
         print(for_minted)
 
         assert len(for_minted) > 0, "No files selected for rendering"
 
-        rendered = template.render(name=nicename, week=int(week), files=for_minted)
+        rendered = template.render(name=nicename, week=int(week), files=for_minted, images=images)
 
         tex_basename = 'Review-{}-{}.tex'.format(name, week)
         pdf_basename = 'Review-{}-{}.pdf'.format(name, week)
